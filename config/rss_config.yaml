@@ -1,0 +1,12 @@
+categories:
+  - id: tech
+    name: 科技
+    sources:
+      # - name: Hacker News Frontpage
+      #   url: https://hnrss.org/frontpage
+      #   icon: https://news.ycombinator.com/favicon.ico
+      #   fetch_limit: 20
+      - name: 少数派
+        url: https://sspai.com/feed
+        icon: https://cdn-static.sspai.com/favicon/sspai.ico
+        fetch_limit: 20

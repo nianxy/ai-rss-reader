@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ article.title }}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; line-height: 1.7; color: #111; max-width: 840px; margin: 20px auto; padding: 0 12px;">
+  <h1>{{ article.title }}</h1>
+  <h3>简短摘要</h3>
+  <p>{{ article.summary_short }}</p>
+  <h3>重点内容总结</h3>
+  <p style="white-space: pre-wrap;">{{ article.summary_keypoints }}</p>
+  <h3>来源</h3>
+  <p>{{ article.source_name }} - <a href="{{ article.link }}" target="_blank" rel="noreferrer">原文链接</a></p>
+</body>
+</html>
