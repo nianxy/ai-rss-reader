@@ -6,13 +6,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 ARG PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn
+ARG TZ=Asia/Shanghai
+ENV TZ=${TZ}
 
 WORKDIR /app
 
-# Minimal runtime deps
-# RUN apt-get update \
-#     && apt-get install -y --no-install-recommends ca-certificates \
-#     && rm -rf /var/lib/apt/lists/*
+# Minimal runtime deps + timezone data
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies first for better layer caching.
 COPY pyproject.toml README.md ./
