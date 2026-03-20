@@ -1,5 +1,6 @@
 import hashlib
 import re
+from html import unescape
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from datetime import datetime
 from email.utils import parsedate_to_datetime
@@ -129,12 +130,56 @@ class RSSIngestService:
                 html = resp.text
         except Exception:
             return ''
-        return html # RSSIngestService._extract_text_from_html(html)
+        return RSSIngestService._extract_focus_text_from_html(html)
 
     @staticmethod
-    def _extract_text_from_html(html: str) -> str:
-        # Remove scripts/styles first to reduce noise.
-        cleaned = re.sub(r'<(script|style)[^>]*>.*?</\\1>', ' ', html, flags=re.IGNORECASE | re.DOTALL)
-        cleaned = re.sub(r'<[^>]+>', ' ', cleaned)
-        cleaned = re.sub(r'\\s+', ' ', cleaned)
-        return cleaned.strip()
+    def _extract_focus_text_from_html(html: str) -> str:
+        # Keep only headings and paragraphs to reduce prompt token usage.
+        cleaned = re.sub(r'<(script|style)[^>]*>.*?</\1>', ' ', html, flags=re.IGNORECASE | re.DOTALL)
+        blocks = list(
+            re.finditer(r'<(?P<tag>h[1-6]|p|tr)\b[^>]*>(?P<inner>.*?)</(?P=tag)>', cleaned, flags=re.IGNORECASE | re.DOTALL)
+        )
+        if not blocks:
+            return ''
+
+        parts: list[str] = []
+        for block in blocks:
+            tag = block.group('tag').lower()
+            inner = block.group('inner')
+
+            if tag.startswith('h'):
+                text = RSSIngestService._normalize_inline_text(inner)
+                if text:
+                    parts.append(f'<{tag}>{text}</{tag}>')
+                continue
+
+            if tag == 'p':
+                text = RSSIngestService._normalize_inline_text(inner)
+                if text:
+                    parts.append(text)
+                continue
+
+            # Preserve table row shape: td/th -> tab, tr -> newline.
+            if tag == 'tr':
+                cells = re.findall(r'<(td|th)\b[^>]*>(.*?)</\1>', inner, flags=re.IGNORECASE | re.DOTALL)
+                if not cells:
+                    continue
+                row_cells = []
+                for _, cell in cells:
+                    cell_text = RSSIngestService._normalize_inline_text(cell)
+                    if cell_text:
+                        row_cells.append(cell_text)
+                if row_cells:
+                    parts.append('\t'.join(row_cells))
+                continue
+
+        return '\n'.join(parts).strip()
+
+    @staticmethod
+    def _normalize_inline_text(raw: str) -> str:
+        text = re.sub(r'<[^>]+>', '', raw)
+        text = unescape(text).replace('\xa0', ' ')
+        text = re.sub(r'\s+', ' ', text).strip()
+        text = re.sub(r'\s+([,.;:!?])', r'\1', text)
+        text = re.sub(r'\s+([，。；：！？、])', r'\1', text)
+        return text
