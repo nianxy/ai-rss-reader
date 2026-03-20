@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th>标题</th>
-          <th style="width: 180px;">来源</th>
+          <th style="width: 180px;">分类</th>
           <th style="width: 220px;">抓取时间</th>
         </tr>
       </thead>
@@ -23,8 +23,11 @@
         <tr>
           <td>
             <a href="/go/{{ article.id }}" rel="noreferrer">{{ article.title }}</a>
+            {% if article.source_icon %}
+            <img class="source-icon" src="{{ article.source_icon }}" alt="{{ article.source_name }}" title="{{ article.source_name }}" />
+            {% endif %}
           </td>
-          <td>{{ article.source_name }}</td>
+          <td>{{ article.category_name }}</td>
           <td>{{ article.created_at.strftime('%Y-%m-%d %H:%M:%S') if article.created_at else '' }}</td>
         </tr>
         {% endfor %}

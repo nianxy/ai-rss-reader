@@ -26,6 +26,20 @@ def _get_category_name(category_id: str) -> str:
         return category_id
 
 
+def _get_config_maps() -> tuple[dict[str, str], dict[str, str]]:
+    try:
+        cfg = load_rss_config(settings.rss_config_path)
+    except Exception:
+        return {}, {}
+    category_map = {item.id: item.name for item in cfg.categories}
+    source_icon_map: dict[str, str] = {}
+    for category in cfg.categories:
+        for source in category.sources:
+            if source.name and source.icon and source.name not in source_icon_map:
+                source_icon_map[source.name] = source.icon
+    return category_map, source_icon_map
+
+
 @router.get('/healthz')
 def healthz() -> dict:
     return {'ok': True}
@@ -73,10 +87,22 @@ def article_list_page(page: int = 1, db: Session = Depends(get_db)) -> HTMLRespo
     rows = db.scalars(
         select(Article).order_by(Article.created_at.desc(), Article.id.desc()).offset(offset).limit(page_size)
     ).all()
+    category_map, source_icon_map = _get_config_maps()
+    items = [
+        {
+            'id': item.id,
+            'title': item.title,
+            'source_name': item.source_name,
+            'source_icon': source_icon_map.get(item.source_name, ''),
+            'category_name': category_map.get(item.category_id, item.category_id),
+            'created_at': item.created_at,
+        }
+        for item in rows
+    ]
 
     tpl = jinja.get_template('article_list.html')
     html = tpl.render(
-        articles=rows,
+        articles=items,
         page=current_page,
         total_pages=total_pages,
         has_prev=current_page > 1,

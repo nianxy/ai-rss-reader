@@ -29,7 +29,7 @@ a {
 a:hover { color: var(--primary-hover); }
 
 .page {
-  max-width: 980px;
+  max-width: 1200px;
   margin: 24px auto;
   padding: 0 14px;
 }
@@ -112,6 +112,16 @@ a:hover { color: var(--primary-hover); }
 
 .summary {
   margin-top: 4px;
+}
+
+.source-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: text-bottom;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background: #fff;
 }
 
 @media (max-width: 720px) {
