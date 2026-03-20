@@ -1,0 +1,15 @@
+services:
+  rss-reader:
+    container_name: rss-reader
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rss-reader:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config

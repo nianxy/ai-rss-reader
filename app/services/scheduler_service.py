@@ -14,6 +14,14 @@ settings = get_settings()
 scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
 
 
+def _parse_cron_expr(expr: str) -> tuple[str, str, str, str, str]:
+    cleaned = (expr or '').strip().strip('"').strip("'")
+    parts = cleaned.split()
+    if len(parts) != 5:
+        raise ValueError(f'Invalid cron expression: "{expr}" (expected 5 fields)')
+    return parts[0], parts[1], parts[2], parts[3], parts[4]
+
+
 def run_fetch_job() -> None:
     rss_cfg = load_rss_config(settings.rss_config_path)
     llm = LLMService()
@@ -35,8 +43,8 @@ def start_scheduler() -> None:
     if scheduler.running:
         return
 
-    fetch_min, fetch_hour, fetch_dom, fetch_month, fetch_dow = settings.fetch_cron.split()
-    daily_min, daily_hour, daily_dom, daily_month, daily_dow = settings.daily_summary_cron.split()
+    fetch_min, fetch_hour, fetch_dom, fetch_month, fetch_dow = _parse_cron_expr(settings.fetch_cron)
+    daily_min, daily_hour, daily_dom, daily_month, daily_dow = _parse_cron_expr(settings.daily_summary_cron)
 
     scheduler.add_job(
         run_fetch_job,
