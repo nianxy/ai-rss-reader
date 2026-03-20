@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     smtp_username: str = Field(default='', alias='SMTP_USERNAME')
     smtp_password: str = Field(default='', alias='SMTP_PASSWORD')
     smtp_use_tls: bool = Field(default=True, alias='SMTP_USE_TLS')
+    smtp_use_ssl: bool = Field(default=False, alias='SMTP_USE_SSL')
     email_from: str = Field(default='', alias='EMAIL_FROM')
     email_to: str = Field(default='', alias='EMAIL_TO')
 
