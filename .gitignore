@@ -54,3 +54,4 @@ htmlcov/
 
 # project specific
 data/digests/
+config/rss_config.yaml
