@@ -91,7 +91,7 @@ class RSSIngestService:
         key = entry_id.strip() or normalized_link
         if not key:
             return ''
-        return hashlib.sha256(key.encode('utf-8')).hexdigest()
+        return hashlib.md5(key.encode('utf-8')).hexdigest()
 
     @staticmethod
     def _normalize_link(link: str) -> str:
