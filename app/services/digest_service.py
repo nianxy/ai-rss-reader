@@ -1,5 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from pathlib import Path
+import json
 
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import and_, select
@@ -16,9 +18,14 @@ settings = get_settings()
 
 def _yesterday_range(now: datetime | None = None) -> tuple[datetime, datetime]:
     now = now or datetime.now()
-    start = datetime(now.year, now.month, now.day) - timedelta(days=1)
-    end = datetime(now.year, now.month, now.day)
-    return start, end
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday_start = today_start - timedelta(days=1)
+    return yesterday_start, today_start
+
+
+def _yesterday_date_str(now: datetime | None = None) -> str:
+    start, _ = _yesterday_range(now)
+    return start.strftime('%Y-%m-%d')
 
 
 class DailyDigestService:
@@ -81,6 +88,9 @@ class DailyDigestService:
                 )
 
             output.append({'category_name': category_name, 'articles': merged_articles})
+        
+        self.save_digest_payload_json(output)
+
         return output
 
     def render_html(self, payload: list[dict]) -> str:
@@ -93,3 +103,11 @@ class DailyDigestService:
             return
         html = self.render_html(payload)
         self.email.send_html(subject='昨日RSS汇总', html=html)
+
+    def save_digest_payload_json(self, payload: list[dict], date_str: str | None = None) -> Path:
+        date_str = date_str or _yesterday_date_str()
+        out_dir = Path(settings.digest_output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / f'{date_str}.json'
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+        return out_path

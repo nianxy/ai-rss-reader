@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     fetch_cron: str = Field(default='*/30 * * * *', alias='FETCH_CRON')
     daily_summary_cron: str = Field(default='30 8 * * *', alias='DAILY_SUMMARY_CRON')
+    digest_output_dir: str = Field(default='data/digests', alias='DIGEST_OUTPUT_DIR')
 
     llm_api_key: str = Field(default='', alias='LLM_API_KEY')
     llm_base_url: str = Field(default='https://api.openai.com/v1', alias='LLM_BASE_URL')

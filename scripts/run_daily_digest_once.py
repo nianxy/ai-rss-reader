@@ -11,4 +11,4 @@ if __name__ == '__main__':
         print(f'categories={len(payload)}')
         if payload:
             html = svc.render_html(payload)
-            print(html[:800])
+            print("Generated.")

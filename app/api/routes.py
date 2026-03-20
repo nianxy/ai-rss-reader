@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
+import json
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -55,4 +57,15 @@ def article_page(article_id: int, db: Session = Depends(get_db)) -> HTMLResponse
         raise HTTPException(status_code=404, detail='article not found')
     tpl = jinja.get_template('article_detail.html')
     html = tpl.render(article=article)
+    return HTMLResponse(content=html)
+
+
+@router.get('/digests/{date_str}', response_class=HTMLResponse)
+def get_digest_html(date_str: str) -> HTMLResponse:
+    out_path = Path(settings.digest_output_dir) / f'{date_str}.json'
+    if not out_path.exists():
+        raise HTTPException(status_code=404, detail='digest json not found')
+    payload = json.loads(out_path.read_text(encoding='utf-8'))
+    tpl = jinja.get_template('daily_digest.html')
+    html = tpl.render(payload=payload, base_url=settings.server_base_url)
     return HTMLResponse(content=html)

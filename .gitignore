@@ -52,3 +52,5 @@ htmlcov/
 .ruff_cache/
 .pyre/
 
+# project specific
+data/digests/

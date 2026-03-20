@@ -9,7 +9,7 @@
   <h3>简短摘要</h3>
   <p>{{ article.summary_short }}</p>
   <h3>重点内容总结</h3>
-  <p style="white-space: pre-wrap;">{{ article.summary_keypoints }}</p>
+  <div>{{ article.summary_keypoints | safe }}</div>
   <h3>来源</h3>
   <p>{{ article.source_name }} - <a href="{{ article.link }}" target="_blank" rel="noreferrer">原文链接</a></p>
 </body>
