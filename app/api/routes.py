@@ -67,5 +67,5 @@ def get_digest_html(date_str: str) -> HTMLResponse:
         raise HTTPException(status_code=404, detail='digest json not found')
     payload = json.loads(out_path.read_text(encoding='utf-8'))
     tpl = jinja.get_template('daily_digest.html')
-    html = tpl.render(payload=payload, base_url=settings.server_base_url)
+    html = tpl.render(payload=payload, base_url=settings.server_base_url, digest_date=date_str)
     return HTMLResponse(content=html)

@@ -93,15 +93,17 @@ class DailyDigestService:
 
         return output
 
-    def render_html(self, payload: list[dict]) -> str:
+    def render_html(self, payload: list[dict], digest_date: str | None = None) -> str:
         tpl = self.jinja.get_template('daily_digest.html')
-        return tpl.render(payload=payload, base_url=settings.server_base_url)
+        digest_date = digest_date or _yesterday_date_str()
+        return tpl.render(payload=payload, base_url=settings.server_base_url, digest_date=digest_date)
 
     def send_yesterday_digest(self) -> None:
         payload = self.build_digest_payload()
         if not payload:
             return
-        html = self.render_html(payload)
+        digest_date = _yesterday_date_str()
+        html = self.render_html(payload, digest_date=digest_date)
         self.email.send_html(subject='昨日RSS汇总', html=html)
 
     def save_digest_payload_json(self, payload: list[dict], date_str: str | None = None) -> Path:
