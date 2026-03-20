@@ -8,7 +8,7 @@ from app.db.base import Base
 
 class Article(Base):
     __tablename__ = 'articles'
-    __table_args__ = (UniqueConstraint('category_id', 'dedup_key', name='uq_category_dedup_key'),)
+    __table_args__ = (UniqueConstraint('dedup_key', name='uq_dedup_key'),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     category_id: Mapped[str] = mapped_column(String(100), index=True)

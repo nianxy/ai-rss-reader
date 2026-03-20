@@ -39,7 +39,6 @@ class RSSIngestService:
 
             existing = self.db.scalar(
                 select(Article).where(
-                    Article.category_id == category.id,
                     Article.dedup_key == dedup_key,
                 )
             )

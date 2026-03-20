@@ -8,4 +8,8 @@ RELOAD="${RELOAD:---reload}"
 
 cd "$(dirname "$0")/.."
 
+# db migration
+alembic upgrade head
+
+# start server
 exec uvicorn app.main:app --host "${HOST}" --port "${PORT}" ${RELOAD}
