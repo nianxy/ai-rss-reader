@@ -24,4 +24,4 @@ class Article(Base):
     summary_keypoints: Mapped[str] = mapped_column(Text, default='')
 
     published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)

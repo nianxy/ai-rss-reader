@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 import json
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -58,6 +58,38 @@ def article_page(article_id: int, db: Session = Depends(get_db)) -> HTMLResponse
     tpl = jinja.get_template('article_detail.html')
     html = tpl.render(article=article)
     return HTMLResponse(content=html)
+
+
+@router.get('/articles', response_class=HTMLResponse)
+def article_list_page(page: int = 1, db: Session = Depends(get_db)) -> HTMLResponse:
+    page_size = 20
+    current_page = max(page, 1)
+    total = db.scalar(select(func.count(Article.id))) or 0
+    total_pages = max((total + page_size - 1) // page_size, 1)
+    if current_page > total_pages:
+        current_page = total_pages
+
+    offset = (current_page - 1) * page_size
+    rows = db.scalars(
+        select(Article).order_by(Article.created_at.desc(), Article.id.desc()).offset(offset).limit(page_size)
+    ).all()
+
+    tpl = jinja.get_template('article_list.html')
+    html = tpl.render(
+        articles=rows,
+        page=current_page,
+        total_pages=total_pages,
+        has_prev=current_page > 1,
+        has_next=current_page < total_pages,
+        prev_page=current_page - 1,
+        next_page=current_page + 1,
+    )
+    return HTMLResponse(content=html)
+
+
+@router.get('/', response_class=HTMLResponse)
+def home(page: int = 1, db: Session = Depends(get_db)) -> HTMLResponse:
+    return article_list_page(page=page, db=db)
 
 
 @router.get('/digests/{date_str}', response_class=HTMLResponse)
