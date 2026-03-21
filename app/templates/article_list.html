@@ -3,12 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>文章列表</title>
+  <title>{{ list_title or '文章列表' }}</title>
   <link rel="stylesheet" href="/static/css/main.css" />
 </head>
 <body>
   <main class="page">
-    <h1 class="page-title">文章列表</h1>
+    <h1 class="page-title">{{ list_title or '文章列表' }}</h1>
+
+    <div class="top-actions">
+      <a href="/digests/latest" target="_blank" rel="noreferrer">最近一次每日汇总</a>
+      <a href="/fetch/manual" target="_blank" rel="noreferrer">手动触发抓取</a>
+      <a href="/favorites">收藏文章</a>
+      <a href="/">文章列表</a>
+    </div>
 
     <table class="article-table">
       <thead>
@@ -40,14 +47,15 @@
     </table>
 
     <div class="pagination">
+      {% set base = page_base if page_base else '/' %}
       {% if has_prev %}
-      <a href="/?page={{ prev_page }}">上一页</a>
+      <a href="{{ base }}?page={{ prev_page }}">上一页</a>
       {% else %}
       <span class="pager-disabled">上一页</span>
       {% endif %}
       <span class="meta">第 {{ page }} / {{ total_pages }} 页</span>
       {% if has_next %}
-      <a href="/?page={{ next_page }}">下一页</a>
+      <a href="{{ base }}?page={{ next_page }}">下一页</a>
       {% else %}
       <span class="pager-disabled">下一页</span>
       {% endif %}

@@ -129,3 +129,32 @@ a:hover { color: var(--primary-hover); }
   .article-table th,
   .article-table td { padding: 8px; font-size: 14px; }
 }
+
+.top-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.top-actions a {
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.btn {
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--primary);
+}
+
+.fav-actions {
+  margin-top: 10px;
+}

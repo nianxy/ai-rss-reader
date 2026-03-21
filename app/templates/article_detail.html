@@ -12,6 +12,18 @@
       <h1 class="page-title">{{ article.title }}</h1>
       <div class="meta">来源：{{ article.source_name }} | 抓取时间：{{ article.created_at }}</div>
 
+      <div class="fav-actions">
+        {% if is_favorited %}
+        <form action="/favorites/{{ article.id }}/remove" method="post">
+          <button class="btn" type="submit">取消收藏</button>
+        </form>
+        {% else %}
+        <form action="/favorites/{{ article.id }}" method="post">
+          <button class="btn" type="submit">收藏</button>
+        </form>
+        {% endif %}
+      </div>
+
       <h3 class="section-title">简短摘要</h3>
       <p>{{ article.summary_short }}</p>
 

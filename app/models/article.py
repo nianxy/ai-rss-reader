@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -24,4 +24,12 @@ class Article(Base):
     summary_keypoints: Mapped[str] = mapped_column(Text, default='')
 
     published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+
+class Favorite(Base):
+    __tablename__ = 'favorites'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    article_id: Mapped[int] = mapped_column(ForeignKey('articles.id', ondelete='CASCADE'), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
