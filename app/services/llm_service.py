@@ -2,7 +2,8 @@ import json
 import re
 import time
 
-import httpx
+from openai import OpenAI
+from openai import APIConnectionError, APITimeoutError, APIError
 
 from app.core.config import get_settings
 
@@ -31,6 +32,7 @@ class LLMService:
         self.api_key = settings.llm_api_key
         self.base_url = settings.llm_base_url.rstrip('/')
         self.model = settings.llm_model
+        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
     def summarize_article(self, title: str, content: str) -> tuple[str, str]:
         if not self.api_key:
@@ -47,9 +49,9 @@ class LLMService:
             ],
             'temperature': 0.2,
             'response_format': {'type': 'json_object'},
+            'extra_body': {'enable_thinking': False},
         }
-        headers = {'Authorization': f'Bearer {self.api_key}'}
-        text = self._post_chat_once_with_retry(payload=payload, headers=headers, timeout=60)
+        text = self._post_chat_once_with_retry(payload=payload, timeout=60)
         if not text:
             raise Exception("Failed to get response from LLM API")
 
@@ -81,23 +83,22 @@ class LLMService:
             ],
             'temperature': 0,
             'response_format': {'type': 'json_object'},
+            'extra_body': {'enable_thinking': False},
         }
-        headers = {'Authorization': f'Bearer {self.api_key}'}
-        text = self._post_chat_once_with_retry(payload=payload, headers=headers, timeout=90)
+        text = self._post_chat_once_with_retry(payload=payload, timeout=90)
         if not text:
             return [{'id': row['id'], 'duplicate_ids': []} for row in article_rows]
 
         result = self._safe_load_json_array(text)
         return result or [{'id': row['id'], 'duplicate_ids': []} for row in article_rows]
 
-    def _post_chat_once_with_retry(self, payload: dict, headers: dict, timeout: int) -> str:
+    def _post_chat_once_with_retry(self, payload: dict, timeout: int) -> str:
         for attempt in range(2):
             try:
-                with httpx.Client(timeout=timeout) as client:
-                    resp = client.post(f'{self.base_url}/chat/completions', json=payload, headers=headers)
-                    resp.raise_for_status()
-                    return str(resp.json()['choices'][0]['message']['content'])
-            except (httpx.TimeoutException, httpx.RequestError, KeyError, ValueError, TypeError):
+                resp = self.client.with_options(timeout=timeout).chat.completions.create(**payload)
+                content = resp.choices[0].message.content
+                return str(content or '')
+            except (APITimeoutError, APIConnectionError, APIError, KeyError, ValueError, TypeError):
                 if attempt == 0:
                     time.sleep(0.8)
                     continue

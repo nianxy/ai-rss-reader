@@ -1,5 +1,5 @@
 services:
-  rss-reader:
+  ai-rss-reader:
     container_name: rss-reader
     build:
       context: .

@@ -20,7 +20,7 @@ DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 CONTEXT="${CONTEXT:-.}"
 
 if [[ -z "${IMAGE_REPO}" ]]; then
-  echo "ERROR: IMAGE_REPO is required, e.g. registry.example.com/namespace/rss-reader" >&2
+  echo "ERROR: IMAGE_REPO is required, e.g. registry.example.com/namespace/ai-rss-reader" >&2
   exit 1
 fi
 

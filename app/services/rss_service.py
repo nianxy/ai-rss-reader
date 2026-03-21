@@ -124,7 +124,7 @@ class RSSIngestService:
     def _fetch_content_from_link(link: str) -> str:
         try:
             with httpx.Client(timeout=10, follow_redirects=True) as client:
-                resp = client.get(link, headers={'User-Agent': 'rss-reader/0.1'})
+                resp = client.get(link, headers={'User-Agent': 'ai-rss-reader/0.1'})
                 resp.raise_for_status()
                 html = resp.text
         except Exception:
